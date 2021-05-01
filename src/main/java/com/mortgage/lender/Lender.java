@@ -1,7 +1,10 @@
 package com.mortgage.lender;
 
 import java.sql.SQLOutput;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Lender {
     private double currentBalance;
@@ -63,4 +66,22 @@ public class Lender {
         return loanStatus.get(applicantID);
     }
 
+    public void expiredLoan() {
+        for (Map.Entry<String,LoanApplicationResult> entry : loanStatus.entrySet()) {
+            LoanApplicationResult loanApplicationResult= entry.getValue();
+            long days = loanApplicationResult.getApplicant().getDate().until(LocalDate.now(), ChronoUnit.DAYS);
+
+            if (loanApplicationResult.getApplicationStatus() == LoanApplicationStatus.APPROVED && days>3) {
+               loanApplicationResult.setApplicationStatus(LoanApplicationStatus.EXPIRED);
+               loanStatus.put(entry.getKey(), loanApplicationResult);
+               currentBalance = currentBalance + loanApplicationResult.getLoanAmount();
+               pendingFunds =  pendingFunds - loanApplicationResult.getLoanAmount();
+            }
+        }
+
+    }
+
+    public LoanApplicationStatus getApplicationStatus(String applicantID) {
+        return loanStatus.get(applicantID).getApplicationStatus();
+    }
 }

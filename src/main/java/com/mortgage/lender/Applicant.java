@@ -1,19 +1,23 @@
 package com.mortgage.lender;
 
+import java.time.LocalDate;
+
 public class Applicant {
     private String id;
     private double requestedAmount;
     private int dtl;
     private int creditScore;
     private double savings;
+    private LocalDate date;
 
 
-    public Applicant(String id,double requestedAmount, int dtl, int creditScore, double savings) {
+    public Applicant(String id,double requestedAmount, int dtl, int creditScore, double savings, LocalDate date) {
         this.setId(id);
         this.setRequestedAmount(requestedAmount);
         this.setDtl(dtl);
         this.setCreditScore(creditScore);
         this.setSavings(savings);
+        this.setDate(date);
     }
 
     public double getRequestedAmount() {
@@ -54,5 +58,13 @@ public class Applicant {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 }

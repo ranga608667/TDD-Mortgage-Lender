@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MortgageLenderTestCase {
@@ -39,7 +41,7 @@ public class MortgageLenderTestCase {
 
     @Test
     void applyForLoan() {
-        Applicant applicant = new Applicant("ID001", 250000, 21, 700, 100000);
+        Applicant applicant = new Applicant("ID001", 250000, 21, 700, 100000, LocalDate.of(2021, 05, 01));
         LoanApplicationResult expectedLoanApplicationResult = new LoanApplicationResult(LoanProcessor.QUALIFIED, applicant.getRequestedAmount(), LoanApplicationStatus.QUALIFIED, applicant);
         LoanApplicationResult actualResult = lender.apply(applicant);
         assertEquals(expectedLoanApplicationResult.getQualification(), actualResult.getQualification());
@@ -47,7 +49,7 @@ public class MortgageLenderTestCase {
         assertEquals(expectedLoanApplicationResult.getApplicationStatus(), actualResult.getApplicationStatus());
         assertEquals(expectedLoanApplicationResult, actualResult);
 
-        Applicant applicant2 = new Applicant("ID002", 250000, 21, 700, 25000);
+        Applicant applicant2 = new Applicant("ID002", 250000, 21, 700, 25000,LocalDate.of(2021, 05, 01));
         LoanApplicationResult expectedLoanApplicationResult2 = new LoanApplicationResult(LoanProcessor.PARTIALLY_QUALIFIED, applicant2.getSavings() * 4, LoanApplicationStatus.QUALIFIED, applicant2);
         LoanApplicationResult actualResult2 = lender.apply(applicant2);
         assertEquals(expectedLoanApplicationResult2.getQualification(), actualResult2.getQualification());
@@ -56,7 +58,7 @@ public class MortgageLenderTestCase {
         assertEquals(expectedLoanApplicationResult2, actualResult2);
 
 
-        Applicant applicant3 = new Applicant("ID003", 250000, 37, 700, 25000);
+        Applicant applicant3 = new Applicant("ID003", 250000, 37, 700, 25000,LocalDate.of(2021, 05, 01));
         LoanApplicationResult expectedLoanApplicationResult3 = new LoanApplicationResult(LoanProcessor.DENIED, 0, LoanApplicationStatus.DENIED, applicant3);
         LoanApplicationResult actualResult3 = lender.apply(applicant3);
         assertEquals(expectedLoanApplicationResult3.getQualification(), actualResult3.getQualification());
@@ -64,7 +66,7 @@ public class MortgageLenderTestCase {
         assertEquals(expectedLoanApplicationResult3.getApplicationStatus(), actualResult3.getApplicationStatus());
         assertEquals(expectedLoanApplicationResult3, actualResult3);
 
-        Applicant applicant4 = new Applicant("ID004", 250000, 21, 600, 25000);
+        Applicant applicant4 = new Applicant("ID004", 250000, 21, 600, 25000,LocalDate.of(2021, 05, 01));
         LoanApplicationResult expectedLoanApplicationResult4 = new LoanApplicationResult(LoanProcessor.DENIED, 0, LoanApplicationStatus.DENIED, applicant4);
         LoanApplicationResult actualResult4 = lender.apply(applicant4);
         assertEquals(expectedLoanApplicationResult4.getQualification(), actualResult4.getQualification());
@@ -81,11 +83,11 @@ public class MortgageLenderTestCase {
     @Test
     void approveLoan() {
 
-        Applicant applicant = new Applicant("ID001", 250000, 21, 700, 100000);
-        Applicant applicant2 = new Applicant("ID002", 250000, 21, 700, 25000);
-        Applicant applicant3 = new Applicant("ID003", 250000, 37, 700, 25000);
-        Applicant applicant4 = new Applicant("ID004", 250000, 21, 600, 25000);
-        Applicant applicant5 = new Applicant("ID005", 250000, 30, 700, 50000);
+        Applicant applicant = new Applicant("ID001", 250000, 21, 700, 100000,LocalDate.of(2021, 05, 01));
+        Applicant applicant2 = new Applicant("ID002", 250000, 21, 700, 25000,LocalDate.of(2021, 05, 01));
+        Applicant applicant3 = new Applicant("ID003", 250000, 37, 700, 25000,LocalDate.of(2021, 05, 01));
+        Applicant applicant4 = new Applicant("ID004", 250000, 21, 600, 25000,LocalDate.of(2021, 05, 01));
+        Applicant applicant5 = new Applicant("ID005", 250000, 30, 700, 50000,LocalDate.of(2021, 05, 01));
         lender.apply(applicant);
         lender.apply(applicant2);
         lender.apply(applicant3);
@@ -107,12 +109,12 @@ public class MortgageLenderTestCase {
     }
 
     /*
-      Test to check the Pending Funds balance once the application is approved
+      Test to check the Pending Funds balance once the application is Approved
      */
     @Test
     void moveBalanceToPendingFunds() {
-        Applicant applicant = new Applicant("ID001", 250000, 21, 700, 100000);
-        Applicant applicant2 = new Applicant("ID002", 250000, 21, 700, 25000);
+        Applicant applicant = new Applicant("ID001", 250000, 21, 700, 100000,LocalDate.of(2021, 05, 01));
+        Applicant applicant2 = new Applicant("ID002", 250000, 21, 700, 25000,LocalDate.of(2021, 05, 01));
         lender.apply(applicant);
         lender.apply(applicant2);
         lender.processLoan("ID001");
@@ -121,9 +123,13 @@ public class MortgageLenderTestCase {
 
     }
 
+    /*
+      Test to check the Pending Funds balance once the application is Accepted
+    */
+
     @Test
     void acceptLoan() {
-        Applicant applicant = new Applicant("ID001", 250000, 21, 700, 100000);
+        Applicant applicant = new Applicant("ID001", 250000, 21, 700, 100000,LocalDate.of(2021, 05, 01));
         lender.apply(applicant);
         lender.processLoan("ID001");
         assertEquals(250000.00, lender.getPendingFunds());
@@ -133,9 +139,12 @@ public class MortgageLenderTestCase {
 
     }
 
+    /*
+       Test to check the Pending Funds balance &  Available Funds once the application is Rejected
+     */
     @Test
     void rejectLoan() {
-        Applicant applicant = new Applicant("ID001", 250000, 21, 700, 100000);
+        Applicant applicant = new Applicant("ID001", 250000, 21, 700, 100000,LocalDate.of(2021, 05, 01));
         lender.apply(applicant);
         lender.processLoan("ID001");
         assertEquals(250000.00, lender.getPendingFunds());
@@ -143,6 +152,23 @@ public class MortgageLenderTestCase {
         assertEquals(0, lender.getPendingFunds());
         assertEquals(400000.0, lender.getFunds());
         assertEquals(LoanApplicationStatus.REJECTED, actual.getApplicationStatus());
+    }
+
+
+   /*
+      Test to check the if the application Status changed to "Expired" after three days of approval and not accepted
+    */
+
+    @Test
+    void expiredLoan(){
+        Applicant applicant = new Applicant("ID001", 250000, 21, 700, 100000,LocalDate.of(2021, 04, 01));
+        lender.apply(applicant);
+        lender.processLoan("ID001");
+        lender.expiredLoan();
+        LoanApplicationStatus actual= lender.getApplicationStatus("ID001");
+        assertEquals(LoanApplicationStatus.EXPIRED, actual);
+        assertEquals(0, lender.getPendingFunds());
+        assertEquals(400000.0, lender.getFunds());
     }
 
 }
