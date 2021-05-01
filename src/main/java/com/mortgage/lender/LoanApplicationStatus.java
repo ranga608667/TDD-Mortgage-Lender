@@ -4,5 +4,8 @@ public enum LoanApplicationStatus {
     QUALIFIED,
     DENIED,
     APPROVED,
-    ON_HOLD
+    ON_HOLD,
+    ACCEPTED,
+    REJECTED,
+    EXPIRED
 }

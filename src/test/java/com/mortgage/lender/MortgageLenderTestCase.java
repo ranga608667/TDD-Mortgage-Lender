@@ -12,19 +12,30 @@ public class MortgageLenderTestCase {
 
     @BeforeEach
     void setUpBeforeClass() throws Exception {
-        this.lender = new Lender(300000);
+        this.lender = new Lender(400000);
     }
 
+    /*
+        Test to get the available funds
+     */
     @Test
     void checkAvailableFunds() {
-        assertEquals(300000.00, lender.getFunds());
+        assertEquals(400000.00, lender.getFunds());
     }
+
+    /*
+      Test to add more funds and get the updated available funds
+   */
 
     @Test
     void depositFunds() {
-        lender.addFunds(0);
-        assertEquals(300000.00, lender.getFunds());
+        lender.addFunds(50000);
+        assertEquals(450000.00, lender.getFunds());
     }
+
+    /*
+      Test to determine the qualifications of the loan applications
+   */
 
     @Test
     void applyForLoan() {
@@ -62,6 +73,11 @@ public class MortgageLenderTestCase {
         assertEquals(expectedLoanApplicationResult4, actualResult4);
     }
 
+    /*
+      Test to derive the update available fund after an application is approved.
+      Also, test to confirm the application cannot be approved if the qualification is "Denied" and send a Warning
+   */
+
     @Test
     void approveLoan(){
 
@@ -69,20 +85,38 @@ public class MortgageLenderTestCase {
         Applicant applicant2 = new Applicant("ID002",250000, 21, 700, 25000);
         Applicant applicant3 = new Applicant("ID003", 250000, 37, 700, 25000);
         Applicant applicant4 = new Applicant("ID004",250000, 21, 600, 25000);
+        Applicant applicant5 = new Applicant("ID005", 250000, 30, 700, 50000);
         lender.apply(applicant);
         lender.apply(applicant2);
         lender.apply(applicant3);
         lender.apply(applicant4);
+        lender.apply(applicant5);
 
 
         assertEquals(LoanApplicationStatus.APPROVED,lender.processLoan("ID001"));
-        assertEquals(50000.00,lender.getFunds());
-        assertEquals(LoanApplicationStatus.ON_HOLD,lender.processLoan("ID002"));
+        assertEquals(150000.00,lender.getFunds());
+        assertEquals(LoanApplicationStatus.APPROVED,lender.processLoan("ID002"));
         assertEquals(50000.00,lender.getFunds());
         assertEquals(LoanApplicationStatus.DENIED,lender.processLoan("ID003"));
         assertEquals(50000.00,lender.getFunds());
         assertEquals(LoanApplicationStatus.DENIED,lender.processLoan("ID004"));
         assertEquals(50000.00,lender.getFunds());
+        assertEquals(LoanApplicationStatus.ON_HOLD,lender.processLoan("ID005"));
+        assertEquals(50000.00,lender.getFunds());
+
+    }
+ /*
+   Test to check the Pending Funds balance once the application is approved
+  */
+    @Test
+    void moveBalanceToPendingFunds(){
+        Applicant applicant = new Applicant("ID001",250000, 21, 700, 100000);
+        Applicant applicant2 = new Applicant("ID002",250000, 21, 700, 25000);
+        lender.apply(applicant);
+        lender.apply(applicant2);
+        lender.processLoan("ID001");
+        lender.processLoan("ID002");
+                assertEquals(350000.00,lender.getPendingFunds());
 
     }
 }
