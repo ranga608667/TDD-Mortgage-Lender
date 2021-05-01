@@ -4,7 +4,9 @@ import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Lender {
     private double currentBalance;
@@ -83,5 +85,13 @@ public class Lender {
 
     public LoanApplicationStatus getApplicationStatus(String applicantID) {
         return loanStatus.get(applicantID).getApplicationStatus();
+    }
+
+    public List<LoanApplicationResult> searByStatus(LoanApplicationStatus status) {
+        return loanStatus
+                .values()
+                .stream()
+                .filter(e -> e.getApplicationStatus() == status)
+                .collect(Collectors.toList());
     }
 }

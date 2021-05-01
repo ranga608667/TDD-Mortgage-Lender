@@ -5,8 +5,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MortgageLenderTestCase {
 
@@ -171,4 +176,17 @@ public class MortgageLenderTestCase {
         assertEquals(400000.0, lender.getFunds());
     }
 
+    @Test
+    void getLoanStatusBasedOnStatus() {
+        Applicant applicant = new Applicant("ID001", 250000, 21, 700, 100000,LocalDate.of(2021, 04, 01));
+        lender.apply(applicant);
+        lender.searByStatus(LoanApplicationStatus.QUALIFIED);
+        List<LoanApplicationResult> expected = new ArrayList<>();
+        expected.add(new LoanApplicationResult(LoanProcessor.QUALIFIED, 250000, LoanApplicationStatus.QUALIFIED, applicant));
+        assertTrue(expected.equals(lender.searByStatus(LoanApplicationStatus.QUALIFIED)));
+
+        //Process the Loan to Approve Status
+        lender.processLoan("ID001");
+        assertEquals(0, lender.searByStatus(LoanApplicationStatus.QUALIFIED).size());
+    }
 }
