@@ -47,4 +47,20 @@ public class Lender {
     public double getPendingFunds() {
         return pendingFunds;
     }
+
+    public LoanApplicationResult applicantResponse(String applicantID, LoanApplicationStatus status) {
+        LoanApplicationResult loanApplicationResult = loanStatus.get(applicantID);
+        if(status == LoanApplicationStatus.ACCEPTED){
+            pendingFunds = pendingFunds - loanApplicationResult.getLoanAmount();
+            loanApplicationResult.setApplicationStatus(status);
+            loanStatus.put(applicantID, loanApplicationResult);
+        } else{
+            currentBalance = currentBalance + loanApplicationResult.getLoanAmount();
+            pendingFunds =  pendingFunds - loanApplicationResult.getLoanAmount();
+            loanApplicationResult.setApplicationStatus(status);
+            loanStatus.put(applicantID, loanApplicationResult);
+        }
+        return loanStatus.get(applicantID);
+    }
+
 }
