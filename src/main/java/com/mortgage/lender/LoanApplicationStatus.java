@@ -2,5 +2,7 @@ package com.mortgage.lender;
 
 public enum LoanApplicationStatus {
     QUALIFIED,
-    DENIED
+    DENIED,
+    APPROVED,
+    ON_HOLD
 }

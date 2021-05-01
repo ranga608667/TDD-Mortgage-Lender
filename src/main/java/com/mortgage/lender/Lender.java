@@ -1,20 +1,44 @@
 package com.mortgage.lender;
 
-public class Lender {
-    private double currentBalance = 100000.00;
+import java.sql.SQLOutput;
+import java.util.HashMap;
 
+public class Lender {
+    private double currentBalance;
+    private HashMap<String,LoanApplicationResult> loanStatus = new HashMap<>();
+    public Lender (double currentBalance){
+        this.currentBalance=currentBalance;
+    }
     public double getFunds() {
         return currentBalance;
     }
 
     public void addFunds(double amount) {
         if (amount <= 0) {
-            throw new IllegalStateException("Amount too small than the accepted amount");
+            System.out.println("No Fund is added");
+            return;
         }
         currentBalance = currentBalance + amount;
     }
 
     public LoanApplicationResult apply(Applicant applicant) {
-        return LoanProcessor.process(applicant);
+        LoanApplicationResult loanApplicationResult= LoanProcessor.process(applicant);
+        loanStatus.put(applicant.getId(), loanApplicationResult );
+        return loanApplicationResult;
+    }
+
+    public LoanApplicationStatus processLoan(String applicantID) {
+        LoanApplicationResult loanApplicationResult=loanStatus.get(applicantID);
+        if (loanApplicationResult.getApplicationStatus() == LoanApplicationStatus.QUALIFIED){
+            if (loanApplicationResult.getLoanAmount() <= currentBalance){
+                loanApplicationResult.setApplicationStatus(LoanApplicationStatus.APPROVED);
+                currentBalance=currentBalance-loanApplicationResult.getLoanAmount();
+                loanStatus.put(applicantID, loanApplicationResult);
+            } else
+                loanApplicationResult.setApplicationStatus(LoanApplicationStatus.ON_HOLD);
+        } else if (loanApplicationResult.getApplicationStatus() == LoanApplicationStatus.DENIED ) {
+            System.out.println("Application you are trying to approve is Not Qualified");
+        }
+        return loanApplicationResult.getApplicationStatus();
     }
 }

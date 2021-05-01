@@ -1,13 +1,15 @@
 package com.mortgage.lender;
 
 public class Applicant {
+    private String id;
     private double requestedAmount;
     private int dtl;
     private int creditScore;
     private double savings;
 
 
-    public Applicant(double requestedAmount, int dtl, int creditScore, double savings) {
+    public Applicant(String id,double requestedAmount, int dtl, int creditScore, double savings) {
+        this.setId(id);
         this.setRequestedAmount(requestedAmount);
         this.setDtl(dtl);
         this.setCreditScore(creditScore);
@@ -44,5 +46,13 @@ public class Applicant {
 
     public void setSavings(double savings) {
         this.savings = savings;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
