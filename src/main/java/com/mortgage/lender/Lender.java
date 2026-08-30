@@ -18,7 +18,8 @@ public class Lender {
     
     // No-argument constructor for Spring dependency injection
     public Lender() {
-        this.currentBalance = 0.0;
+        this.currentBalance = 400000.0; // Default initial balance
+        this.pendingFunds = 400000.0; // Default pending funds
     }
     
     // Constructor with initial balance - used for testing or explicit initialization
