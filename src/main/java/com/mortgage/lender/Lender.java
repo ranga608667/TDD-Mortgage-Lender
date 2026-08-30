@@ -1,5 +1,8 @@
 package com.mortgage.lender;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -7,16 +10,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Component
 public class Lender {
     private double currentBalance;
     private double pendingFunds;
     private HashMap<String, LoanApplicationResult> loanStatus = new HashMap<>();
     
+    // No-argument constructor for Spring dependency injection
+    public Lender() {
+        this.currentBalance = 0.0;
+    }
+    
+    // Constructor with initial balance - used for testing or explicit initialization
     public Lender(double currentBalance){
         if (currentBalance < 0) {
             throw new IllegalArgumentException("Initial balance cannot be negative");
         }
         this.currentBalance = currentBalance;
+    }
+    
+    @Value("${lender.initial.balance:400000.0}")
+    private double initialBalance;
+    
+    public void init() {
+        this.currentBalance = initialBalance;
     }
     
     public double getFunds() {
