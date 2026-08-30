@@ -180,13 +180,13 @@ public class MortgageLenderTestCase {
     void getLoanStatusBasedOnStatus() {
         Applicant applicant = new Applicant("ID001", 250000, 21, 700, 100000,LocalDate.of(2021, 04, 01));
         lender.apply(applicant);
-        lender.searByStatus(LoanApplicationStatus.QUALIFIED);
+        lender.searchByStatus(LoanApplicationStatus.QUALIFIED);
         List<LoanApplicationResult> expected = new ArrayList<>();
         expected.add(new LoanApplicationResult(LoanProcessor.QUALIFIED, 250000, LoanApplicationStatus.QUALIFIED, applicant));
-        assertTrue(expected.equals(lender.searByStatus(LoanApplicationStatus.QUALIFIED)));
+        assertTrue(expected.equals(lender.searchByStatus(LoanApplicationStatus.QUALIFIED)));
 
         //Process the Loan to Approve Status
         lender.processLoan("ID001");
-        assertEquals(0, lender.searByStatus(LoanApplicationStatus.QUALIFIED).size());
+        assertEquals(0, lender.searchByStatus(LoanApplicationStatus.QUALIFIED).size());
     }
 }

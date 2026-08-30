@@ -1,6 +1,5 @@
 package com.mortgage.lender;
 
-import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -11,40 +10,60 @@ import java.util.stream.Collectors;
 public class Lender {
     private double currentBalance;
     private double pendingFunds;
-    private HashMap<String,LoanApplicationResult> loanStatus = new HashMap<>();
-    public Lender (double currentBalance){
-        this.currentBalance=currentBalance;
+    private HashMap<String, LoanApplicationResult> loanStatus = new HashMap<>();
+    
+    public Lender(double currentBalance){
+        if (currentBalance < 0) {
+            throw new IllegalArgumentException("Initial balance cannot be negative");
+        }
+        this.currentBalance = currentBalance;
     }
+    
     public double getFunds() {
         return currentBalance;
     }
 
     public void addFunds(double amount) {
         if (amount <= 0) {
-            System.out.println("No Fund is added");
-            return;
+            throw new IllegalArgumentException("Fund amount must be positive");
         }
-        currentBalance = currentBalance + amount;
+        this.currentBalance = this.currentBalance + amount;
     }
 
     public LoanApplicationResult apply(Applicant applicant) {
-        LoanApplicationResult loanApplicationResult= LoanProcessor.process(applicant);
-        loanStatus.put(applicant.getId(), loanApplicationResult );
+        if (applicant == null) {
+            throw new IllegalArgumentException("Applicant cannot be null");
+        }
+        if (applicant.getId() == null) {
+            throw new IllegalArgumentException("Applicant ID cannot be null");
+        }
+        
+        LoanApplicationResult loanApplicationResult = LoanProcessor.process(applicant);
+        loanStatus.put(applicant.getId(), loanApplicationResult);
         return loanApplicationResult;
     }
 
     public LoanApplicationStatus processLoan(String applicantID) {
-        LoanApplicationResult loanApplicationResult=loanStatus.get(applicantID);
+        if (applicantID == null) {
+            throw new IllegalArgumentException("Applicant ID cannot be null");
+        }
+        
+        LoanApplicationResult loanApplicationResult = loanStatus.get(applicantID);
+        if (loanApplicationResult == null) {
+            throw new IllegalArgumentException("No application found for applicant ID: " + applicantID);
+        }
+        
         if (loanApplicationResult.getApplicationStatus() == LoanApplicationStatus.QUALIFIED){
             if (loanApplicationResult.getLoanAmount() <= currentBalance){
                 loanApplicationResult.setApplicationStatus(LoanApplicationStatus.APPROVED);
-                currentBalance=currentBalance-loanApplicationResult.getLoanAmount();
+                currentBalance = currentBalance - loanApplicationResult.getLoanAmount();
                 loanStatus.put(applicantID, loanApplicationResult);
-                pendingFunds=pendingFunds+loanApplicationResult.getLoanAmount();
-            } else
+                pendingFunds = pendingFunds + loanApplicationResult.getLoanAmount();
+            } else {
                 loanApplicationResult.setApplicationStatus(LoanApplicationStatus.ON_HOLD);
-        } else if (loanApplicationResult.getApplicationStatus() == LoanApplicationStatus.DENIED ) {
-            System.out.println("Application you are trying to approve is Not Qualified");
+            }
+        } else if (loanApplicationResult.getApplicationStatus() == LoanApplicationStatus.DENIED) {
+            // No action needed - already denied
         }
         return loanApplicationResult.getApplicationStatus();
     }
@@ -54,14 +73,25 @@ public class Lender {
     }
 
     public LoanApplicationResult applicantResponse(String applicantID, LoanApplicationStatus status) {
+        if (applicantID == null) {
+            throw new IllegalArgumentException("Applicant ID cannot be null");
+        }
+        if (status == null) {
+            throw new IllegalArgumentException("Status cannot be null");
+        }
+        
         LoanApplicationResult loanApplicationResult = loanStatus.get(applicantID);
+        if (loanApplicationResult == null) {
+            throw new IllegalArgumentException("No application found for applicant ID: " + applicantID);
+        }
+        
         if(status == LoanApplicationStatus.ACCEPTED){
             pendingFunds = pendingFunds - loanApplicationResult.getLoanAmount();
             loanApplicationResult.setApplicationStatus(status);
             loanStatus.put(applicantID, loanApplicationResult);
-        } else{
+        } else {
             currentBalance = currentBalance + loanApplicationResult.getLoanAmount();
-            pendingFunds =  pendingFunds - loanApplicationResult.getLoanAmount();
+            pendingFunds = pendingFunds - loanApplicationResult.getLoanAmount();
             loanApplicationResult.setApplicationStatus(status);
             loanStatus.put(applicantID, loanApplicationResult);
         }
@@ -69,25 +99,40 @@ public class Lender {
     }
 
     public void expiredLoan() {
-        for (Map.Entry<String,LoanApplicationResult> entry : loanStatus.entrySet()) {
-            LoanApplicationResult loanApplicationResult= entry.getValue();
-            long days = loanApplicationResult.getApplicant().getDate().until(LocalDate.now(), ChronoUnit.DAYS);
+        LocalDate currentDate = LocalDate.now();
+        for (Map.Entry<String, LoanApplicationResult> entry : loanStatus.entrySet()) {
+            LoanApplicationResult loanApplicationResult = entry.getValue();
+            if (loanApplicationResult.getApplicant() == null || loanApplicationResult.getApplicant().getDate() == null) {
+                continue; // Skip if applicant or date is null
+            }
+            
+            long days = loanApplicationResult.getApplicant().getDate().until(currentDate, ChronoUnit.DAYS);
 
-            if (loanApplicationResult.getApplicationStatus() == LoanApplicationStatus.APPROVED && days>3) {
+            if (loanApplicationResult.getApplicationStatus() == LoanApplicationStatus.APPROVED && days > 3) {
                loanApplicationResult.setApplicationStatus(LoanApplicationStatus.EXPIRED);
                loanStatus.put(entry.getKey(), loanApplicationResult);
                currentBalance = currentBalance + loanApplicationResult.getLoanAmount();
-               pendingFunds =  pendingFunds - loanApplicationResult.getLoanAmount();
+               pendingFunds = pendingFunds - loanApplicationResult.getLoanAmount();
             }
         }
 
     }
 
     public LoanApplicationStatus getApplicationStatus(String applicantID) {
-        return loanStatus.get(applicantID).getApplicationStatus();
+        if (applicantID == null) {
+            throw new IllegalArgumentException("Applicant ID cannot be null");
+        }
+        LoanApplicationResult result = loanStatus.get(applicantID);
+        if (result == null) {
+            throw new IllegalArgumentException("No application found for applicant ID: " + applicantID);
+        }
+        return result.getApplicationStatus();
     }
 
-    public List<LoanApplicationResult> searByStatus(LoanApplicationStatus status) {
+    public List<LoanApplicationResult> searchByStatus(LoanApplicationStatus status) {
+        if (status == null) {
+            throw new IllegalArgumentException("Status cannot be null");
+        }
         return loanStatus
                 .values()
                 .stream()

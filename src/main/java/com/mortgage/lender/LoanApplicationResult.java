@@ -29,6 +29,9 @@ public class LoanApplicationResult {
     }
 
     public void setLoanAmount(double loanAmount) {
+        if (loanAmount < 0) {
+            throw new IllegalArgumentException("Loan amount cannot be negative");
+        }
         this.loanAmount = loanAmount;
     }
 
@@ -48,11 +51,19 @@ public class LoanApplicationResult {
         this.applicant = applicant;
     }
 
+    @Override
     public boolean equals(Object o) {
-        LoanApplicationResult loanApplicationResult = (LoanApplicationResult) o;
-        return Objects.equals(qualification, loanApplicationResult.qualification) &&
-                Objects.equals(loanAmount, loanApplicationResult.loanAmount) &&
-                Objects.equals(applicationStatus, loanApplicationResult.applicationStatus);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LoanApplicationResult that = (LoanApplicationResult) o;
+        return Objects.equals(qualification, that.qualification) &&
+                Objects.equals(loanAmount, that.loanAmount) &&
+                Objects.equals(applicationStatus, that.applicationStatus) &&
+                Objects.equals(applicant, that.applicant);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(qualification, loanAmount, applicationStatus, applicant);
+    }
 }
