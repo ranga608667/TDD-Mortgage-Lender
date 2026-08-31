@@ -1,14 +1,17 @@
 package com.mortgage.lender;
 
-import org.junit.jupiter.api.BeforeAll;
+import com.mortgage.lender.dto.Applicant;
+import com.mortgage.lender.dto.LoanApplicationResult;
+import com.mortgage.lender.dto.LoanApplicationStatus;
+import com.mortgage.lender.service.Lender;
+import com.mortgage.lender.service.LoanProcessor;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

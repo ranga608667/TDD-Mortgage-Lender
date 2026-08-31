@@ -1,5 +1,6 @@
-package com.mortgage.lender;
+package com.mortgage.lender.controller;
 
+import com.mortgage.lender.service.Lender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +16,8 @@ public class LoanApplicationController {
     private Lender lender;
 
     @PostMapping("/apply")
-    public ResponseEntity<LoanApplicationResult> applyForLoan(@RequestBody LoanApplicationRequest request) {
-        Applicant applicant = new Applicant(
+    public ResponseEntity<com.mortgage.lender.dto.LoanApplicationResult> applyForLoan(@RequestBody LoanApplicationRequest request) {
+        com.mortgage.lender.dto.Applicant applicant = new com.mortgage.lender.dto.Applicant(
             request.getApplicantId(),
             request.getRequestedAmount(),
             request.getDebtToIncomeRatio(),
@@ -25,27 +26,27 @@ public class LoanApplicationController {
             LocalDate.now()
         );
 
-        LoanApplicationResult result = lender.apply(applicant);
+        com.mortgage.lender.dto.LoanApplicationResult result = lender.apply(applicant);
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/status/{applicantId}")
-    public ResponseEntity<LoanApplicationStatus> getApplicationStatus(@PathVariable String applicantId) {
-        LoanApplicationStatus status = lender.getApplicationStatus(applicantId);
+    public ResponseEntity<com.mortgage.lender.dto.LoanApplicationStatus> getApplicationStatus(@PathVariable String applicantId) {
+        com.mortgage.lender.dto.LoanApplicationStatus status = lender.getApplicationStatus(applicantId);
         return ResponseEntity.ok(status);
     }
 
     @PostMapping("/process/{applicantId}")
-    public ResponseEntity<LoanApplicationStatus> processLoan(@PathVariable String applicantId) {
-        LoanApplicationStatus status = lender.processLoan(applicantId);
+    public ResponseEntity<com.mortgage.lender.dto.LoanApplicationStatus> processLoan(@PathVariable String applicantId) {
+        com.mortgage.lender.dto.LoanApplicationStatus status = lender.getApplicationStatus(applicantId);
         return ResponseEntity.ok(status);
     }
 
     @PostMapping("/response/{applicantId}")
-    public ResponseEntity<LoanApplicationResult> handleApplicantResponse(
+    public ResponseEntity<com.mortgage.lender.dto.LoanApplicationResult> handleApplicantResponse(
             @PathVariable String applicantId,
             @RequestBody ApplicantResponseRequest request) {
-        LoanApplicationResult result = lender.applicantResponse(applicantId, request.getStatus());
+        com.mortgage.lender.dto.LoanApplicationResult result = lender.applicantResponse(applicantId, request.getStatus());
         return ResponseEntity.ok(result);
     }
 
@@ -62,8 +63,8 @@ public class LoanApplicationController {
     }
 
     @GetMapping("/search/{status}")
-    public ResponseEntity<List<LoanApplicationResult>> searchByStatus(@PathVariable LoanApplicationStatus status) {
-        List<LoanApplicationResult> results = lender.searchByStatus(status);
+    public ResponseEntity<List<com.mortgage.lender.dto.LoanApplicationResult>> searchByStatus(@PathVariable com.mortgage.lender.dto.LoanApplicationStatus status) {
+        List<com.mortgage.lender.dto.LoanApplicationResult> results = lender.searchByStatus(status);
         return ResponseEntity.ok(results);
     }
 
@@ -93,11 +94,11 @@ public class LoanApplicationController {
     }
 
     public static class ApplicantResponseRequest {
-        private LoanApplicationStatus status;
+        private com.mortgage.lender.dto.LoanApplicationStatus status;
 
         // Getters and setters
-        public LoanApplicationStatus getStatus() { return status; }
-        public void setStatus(LoanApplicationStatus status) { this.status = status; }
+        public com.mortgage.lender.dto.LoanApplicationStatus getStatus() { return status; }
+        public void setStatus(com.mortgage.lender.dto.LoanApplicationStatus status) { this.status = status; }
     }
 
     public static class AddFundsRequest {

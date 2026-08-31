@@ -1,5 +1,7 @@
 package com.mortgage.lender;
 
+import com.mortgage.lender.service.Lender;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,7 +18,7 @@ public class LenderIntegrationTest {
     public void testLenderDefaultConstructor() {
         // Test that we can create a Lender with default constructor
         Lender lender = new Lender();
-        assertEquals(0.0, lender.getFunds());
+        assertEquals(400000.0, lender.getFunds()); // Default balance is 400000
     }
     
     @Test

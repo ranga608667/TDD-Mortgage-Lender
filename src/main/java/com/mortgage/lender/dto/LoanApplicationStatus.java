@@ -1,4 +1,4 @@
-package com.mortgage.lender;
+package com.mortgage.lender.dto;
 
 public enum LoanApplicationStatus {
     QUALIFIED,

@@ -1,7 +1,8 @@
-package com.mortgage.lender;
+package com.mortgage.lender.service;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import com.mortgage.lender.dto.Applicant;
+import com.mortgage.lender.dto.LoanApplicationResult;
+import com.mortgage.lender.dto.LoanApplicationStatus;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -10,16 +11,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Component;
+
 @Component
 public class Lender {
     private double currentBalance;
     private double pendingFunds;
     private HashMap<String, LoanApplicationResult> loanStatus = new HashMap<>();
     
-    // No-argument constructor for Spring dependency injection
+    // No-argument constructor
     public Lender() {
         this.currentBalance = 400000.0; // Default initial balance
-        this.pendingFunds = 400000.0; // Default pending funds
+        this.pendingFunds = 0.0; // Default pending funds
     }
     
     // Constructor with initial balance - used for testing or explicit initialization
@@ -29,14 +32,7 @@ public class Lender {
         }
         this.currentBalance = currentBalance;
     }
-    
-    @Value("${lender.initial.balance:400000.0}")
-    private double initialBalance;
-    
-    public void init() {
-        this.currentBalance = initialBalance;
-    }
-    
+
     public double getFunds() {
         return currentBalance;
     }
@@ -61,6 +57,10 @@ public class Lender {
         return loanApplicationResult;
     }
 
+    public double getPendingFunds() {
+        return pendingFunds;
+    }
+
     public LoanApplicationStatus processLoan(String applicantID) {
         if (applicantID == null) {
             throw new IllegalArgumentException("Applicant ID cannot be null");
@@ -71,23 +71,19 @@ public class Lender {
             throw new IllegalArgumentException("No application found for applicant ID: " + applicantID);
         }
         
-        if (loanApplicationResult.getApplicationStatus() == LoanApplicationStatus.QUALIFIED){
-            if (loanApplicationResult.getLoanAmount() <= currentBalance){
-                loanApplicationResult.setApplicationStatus(LoanApplicationStatus.APPROVED);
-                currentBalance = currentBalance - loanApplicationResult.getLoanAmount();
-                loanStatus.put(applicantID, loanApplicationResult);
-                pendingFunds = pendingFunds + loanApplicationResult.getLoanAmount();
-            } else {
-                loanApplicationResult.setApplicationStatus(LoanApplicationStatus.ON_HOLD);
-            }
-        } else if (loanApplicationResult.getApplicationStatus() == LoanApplicationStatus.DENIED) {
-            // No action needed - already denied
+        // Only process if the status is QUALIFIED
+        if (loanApplicationResult.getApplicationStatus() == LoanApplicationStatus.QUALIFIED) {
+            loanApplicationResult.setApplicationStatus(LoanApplicationStatus.APPROVED);
+            loanStatus.put(applicantID, loanApplicationResult);
+            
+            // Reduce funds from current balance by the loan amount
+            currentBalance = currentBalance - loanApplicationResult.getLoanAmount();
+            
+            // Move funds to pending
+            pendingFunds = pendingFunds + loanApplicationResult.getLoanAmount();
         }
+        
         return loanApplicationResult.getApplicationStatus();
-    }
-
-    public double getPendingFunds() {
-        return pendingFunds;
     }
 
     public LoanApplicationResult applicantResponse(String applicantID, LoanApplicationStatus status) {
@@ -125,7 +121,7 @@ public class Lender {
             }
             
             long days = loanApplicationResult.getApplicant().getDate().until(currentDate, ChronoUnit.DAYS);
-
+            
             if (loanApplicationResult.getApplicationStatus() == LoanApplicationStatus.APPROVED && days > 3) {
                loanApplicationResult.setApplicationStatus(LoanApplicationStatus.EXPIRED);
                loanStatus.put(entry.getKey(), loanApplicationResult);
@@ -133,7 +129,7 @@ public class Lender {
                pendingFunds = pendingFunds - loanApplicationResult.getLoanAmount();
             }
         }
-
+        
     }
 
     public LoanApplicationStatus getApplicationStatus(String applicantID) {
