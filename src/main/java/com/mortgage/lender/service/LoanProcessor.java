@@ -35,7 +35,7 @@ public class LoanProcessor {
                 return new LoanApplicationResult(QUALIFIED, applicant.getRequestedAmount(), LoanApplicationStatus.QUALIFIED, applicant);
             } else {
                 double loanAmount = 4 * applicant.getSavings();
-                return new LoanApplicationResult(PARTIALLY_QUALIFIED, loanAmount, LoanApplicationStatus.QUALIFIED, applicant);
+                return new LoanApplicationResult(PARTIALLY_QUALIFIED, loanAmount, LoanApplicationStatus.PARTIALLY_QUALIFIED, applicant);
             }
         } else {
             return new LoanApplicationResult(DENIED, 0, LoanApplicationStatus.DENIED, applicant);

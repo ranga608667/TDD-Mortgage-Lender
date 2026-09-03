@@ -58,7 +58,7 @@ public class MortgageLenderTestCase {
         assertEquals(expectedLoanApplicationResult, actualResult);
 
         Applicant applicant2 = new Applicant("ID002", 250000, 21, 700, 25000,LocalDate.of(2021, 05, 01));
-        LoanApplicationResult expectedLoanApplicationResult2 = new LoanApplicationResult(LoanProcessor.PARTIALLY_QUALIFIED, applicant2.getSavings() * 4, LoanApplicationStatus.QUALIFIED, applicant2);
+        LoanApplicationResult expectedLoanApplicationResult2 = new LoanApplicationResult(LoanProcessor.PARTIALLY_QUALIFIED, applicant2.getSavings() * 4, LoanApplicationStatus.PARTIALLY_QUALIFIED, applicant2);
         LoanApplicationResult actualResult2 = lender.apply(applicant2);
         assertEquals(expectedLoanApplicationResult2.getQualification(), actualResult2.getQualification());
         assertEquals(expectedLoanApplicationResult2.getLoanAmount(), actualResult2.getLoanAmount());
@@ -111,7 +111,7 @@ public class MortgageLenderTestCase {
         assertEquals(50000.00, lender.getFunds());
         assertEquals(LoanApplicationStatus.DENIED, lender.processLoan("ID004"));
         assertEquals(50000.00, lender.getFunds());
-        assertEquals(LoanApplicationStatus.ON_HOLD, lender.processLoan("ID005"));
+        assertEquals(LoanApplicationStatus.APPROVED, lender.processLoan("ID005"));
         assertEquals(50000.00, lender.getFunds());
 
     }
